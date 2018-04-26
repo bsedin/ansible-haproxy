@@ -1,0 +1,5 @@
+- name: reload haproxy
+  shell: docker kill --signal=HUP {{ haproxy_container_name }}
+
+- name: restart haproxy
+  shell: docker restart {{ haproxy_container_name }}

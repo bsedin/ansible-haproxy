@@ -1,0 +1,26 @@
+---
+- name: ensure haproxy config dir
+  file:
+    dest: '{{ haproxy_config_dir }}'
+    state: directory
+
+- name: create haproxy config file
+  template:
+    src: haproxy.cfg.j2
+    dest: '{{ haproxy_config_dir }}/haproxy.cfg'
+  notify:
+    - reload haproxy
+
+- name: run haproxy container
+  docker_container:
+    state: started
+    restart: yes
+    recreate: yes
+    name: '{{ haproxy_container_name }}'
+    image: '{{ haproxy_image }}:{{ haproxy_version }}'
+    restart_policy: always
+    published_ports: '{{ haproxy_published_ports | default([]) }}'
+    links: '{{ haproxy_links }}'
+    networks: '{{ haproxy_networks }}'
+    volumes:
+      - '{{ haproxy_config_dir }}/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro'

@@ -1,0 +1,10 @@
+---
+haproxy_container_name: haproxy
+haproxy_image: haproxy
+haproxy_version: latest
+haproxy_config_dir: /opt/docker/services/haproxy
+haproxy_published_ports: []
+haproxy_links: []
+haproxy_networks: []
+
+haproxy_configuration: ''
