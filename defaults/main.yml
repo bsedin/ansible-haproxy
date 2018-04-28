@@ -7,5 +7,10 @@ haproxy_published_ports: []
 haproxy_links: []
 haproxy_network_mode: ''
 haproxy_networks: []
+haproxy_maxconn: 1000
+haproxy_sysctls:
+  net.core.somaxconn: '{{ haproxy_maxconn }}'
+haproxy_volumes:
+  - '{{ haproxy_config_dir }}/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro'
 
 haproxy_configuration: ''

@@ -23,5 +23,5 @@
     links: '{{ haproxy_links }}'
     network_mode: '{{ haproxy_network_mode }}'
     networks: '{{ haproxy_networks }}'
-    volumes:
-      - '{{ haproxy_config_dir }}/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro'
+    sysctls: '{{ haproxy_sysctls }}'
+    volumes: '{{ haproxy_volumes }}'
