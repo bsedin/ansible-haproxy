@@ -14,14 +14,18 @@
 - name: run haproxy container
   docker_container:
     state: started
-    restart: yes
-    recreate: yes
+    restart: no
+    recreate: no
     name: '{{ haproxy_container_name }}'
     image: '{{ haproxy_image }}:{{ haproxy_version }}'
     restart_policy: always
-    published_ports: '{{ haproxy_published_ports | default([]) }}'
+    published_ports: '{{ haproxy_published_ports }}'
     links: '{{ haproxy_links }}'
     network_mode: '{{ haproxy_network_mode }}'
     networks: '{{ haproxy_networks }}'
     sysctls: '{{ haproxy_sysctls }}'
     volumes: '{{ haproxy_volumes }}'
+    command: '{{ haproxy_command }}'
+
+- name: reload haproxy
+  shell: docker kill --signal=HUP {{ haproxy_container_name }}

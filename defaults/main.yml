@@ -1,16 +1,16 @@
 ---
 haproxy_container_name: haproxy
 haproxy_image: haproxy
-haproxy_version: latest
+haproxy_version: alpine
 haproxy_config_dir: /opt/docker/services/haproxy
 haproxy_published_ports: []
 haproxy_links: []
-haproxy_network_mode: ''
+haproxy_network_mode: bridge
 haproxy_networks: []
 haproxy_maxconn: 1000
 haproxy_sysctls:
   net.core.somaxconn: '{{ haproxy_maxconn }}'
 haproxy_volumes:
-  - '{{ haproxy_config_dir }}/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro'
-
+  - '{{ haproxy_config_dir }}:/usr/local/etc/haproxy'
+haproxy_command: ''
 haproxy_configuration: ''
