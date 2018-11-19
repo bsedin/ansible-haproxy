@@ -24,6 +24,7 @@
     network_mode: '{{ haproxy_network_mode }}'
     networks: '{{ haproxy_networks }}'
     sysctls: '{{ haproxy_sysctls }}'
+    ulimits: '{{ haproxy_ulimits }}'
     volumes: '{{ haproxy_volumes }}'
     command: '{{ haproxy_command }}'
 

@@ -8,6 +8,8 @@ haproxy_links: []
 haproxy_network_mode: bridge
 haproxy_networks: []
 haproxy_maxconn: 1000
+haproxy_ulimits:
+  - nofile:65536:65536
 haproxy_sysctls:
   net.core.somaxconn: '{{ haproxy_maxconn }}'
 haproxy_volumes:
