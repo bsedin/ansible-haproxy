@@ -27,6 +27,8 @@
     ulimits: '{{ haproxy_ulimits }}'
     volumes: '{{ haproxy_volumes }}'
     command: '{{ haproxy_command }}'
+    log_driver: '{{ haproxy_container_log_driver }}'
+    log_opt: '{{ haproxy_container_log_opt }}'
 
 - name: reload haproxy
   shell: docker kill --signal=HUP {{ haproxy_container_name }}
