@@ -17,4 +17,4 @@ haproxy_volumes:
 haproxy_command: ''
 haproxy_configuration: ''
 haproxy_container_log_driver: ''
-haproxy_container_log_opt: ''
+haproxy_container_log_opt: {}
