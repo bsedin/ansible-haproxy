@@ -8,8 +8,23 @@
   template:
     src: haproxy.cfg.j2
     dest: '{{ haproxy_config_dir }}/haproxy.cfg'
-  notify:
-    - reload haproxy
+
+- name: test haproxy configuration
+  docker_container:
+    state: started
+    restart: yes
+    recreate: yes
+    restart_policy: no
+    auto_remove: no
+    detach: no
+    interactive: no
+    name: haproxy-configtest
+    links: '{{ haproxy_links }}'
+    networks: '{{ haproxy_networks }}'
+    image: '{{ haproxy_image }}:{{ haproxy_version }}'
+    volumes: '{{ haproxy_volumes }}'
+    entrypoint: ''
+    command: 'haproxy -c -V -f /usr/local/etc/haproxy/haproxy.cfg'
 
 - name: run haproxy container
   docker_container:
