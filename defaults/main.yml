@@ -1,20 +1,61 @@
 ---
 haproxy_container_name: haproxy
 haproxy_image: haproxy
-haproxy_version: alpine
-haproxy_config_dir: /opt/docker/services/haproxy
+haproxy_dir: /opt/docker/services/haproxy
+haproxy_config_dir: '{{ haproxy_dir }}/config'
+haproxy_ssl_dir: '{{ haproxy_dir }}/ssl'
 haproxy_published_ports: []
 haproxy_links: []
 haproxy_network_mode: bridge
 haproxy_networks: []
+haproxy_user: 99
+haproxy_group: 99
 haproxy_maxconn: 1000
 haproxy_ulimits:
   - nofile:65536:65536
 haproxy_sysctls:
-  net.core.somaxconn: '{{ haproxy_maxconn }}'
+  net.core.somaxconn: '{{ haproxy_maxconn * 2 }}'
+  net.ipv4.ip_unprivileged_port_start: 0
 haproxy_volumes:
-  - '{{ haproxy_config_dir }}:/usr/local/etc/haproxy'
-haproxy_command: ''
-haproxy_configuration: ''
+  - '{{ haproxy_config_dir }}:/var/lib/haproxy/config'
+  - '{{ haproxy_ssl_dir }}:/var/lib/haproxy/ssl:ro'
+haproxy_command: haproxy -V -f /var/lib/haproxy/config/haproxy.cfg
 haproxy_container_log_driver: ''
 haproxy_container_log_opt: {}
+
+haproxy_configuration: |
+  global
+      maxconn {{ haproxy_maxconn }}
+      tune.ssl.default-dh-param 2048
+
+      ssl-default-bind-curves X25519MLKEM768:X25519:prime256v1:secp384r1
+      ssl-default-bind-ciphersuites TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
+      ssl-default-bind-options prefer-client-ciphers ssl-min-ver TLSv1.2 no-tls-tickets
+
+      ssl-default-server-curves X25519MLKEM768:X25519:prime256v1:secp384r1
+      ssl-default-server-ciphersuites TLS_AES_128_GCM_SHA256:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256
+      ssl-default-server-options ssl-min-ver TLSv1.2 no-tls-tickets
+
+  defaults
+      timeout client 50s
+      timeout server 50s
+      timeout connect 1s
+      timeout queue 1s
+      option http-keep-alive
+      option forwardfor
+      option redispatch 1
+      option httplog
+      option log-health-checks
+      option dontlognull
+      option dontlog-normal
+      log global
+
+  listen stats
+      bind :14567
+      mode http
+      balance
+      timeout client 5000
+      timeout connect 4000
+      timeout server 30000
+      stats enable
+      stats uri  /haproxy?stats

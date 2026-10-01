@@ -1,15 +1,22 @@
 ---
 - name: ensure haproxy config dir
   file:
-    dest: '{{ haproxy_config_dir }}'
+    dest: '{{ item }}'
     state: directory
+    owner: '{{ haproxy_user }}'
+    group: '{{ haproxy_group }}'
+  with_items:
+    - '{{ haproxy_config_dir }}'
+    - '{{ haproxy_ssl_dir }}'
 
-- name: create haproxy config file
+- name: Create haproxy config file
   template:
     src: haproxy.cfg.j2
     dest: '{{ haproxy_config_dir }}/haproxy.cfg'
+    owner: '{{ haproxy_user }}'
+    group: '{{ haproxy_group }}'
 
-- name: test haproxy configuration
+- name: Test haproxy configuration
   docker_container:
     state: started
     restart: yes
@@ -21,18 +28,18 @@
     name: haproxy-configtest
     links: '{{ haproxy_links }}'
     networks: '{{ haproxy_networks }}'
-    image: '{{ haproxy_image }}:{{ haproxy_version }}'
+    image: '{{ haproxy_image }}'
     volumes: '{{ haproxy_volumes }}'
     entrypoint: ''
-    command: 'haproxy -c -V -f /usr/local/etc/haproxy/haproxy.cfg'
+    command: haproxy -c -V -f /var/lib/haproxy/config/haproxy.cfg
 
-- name: run haproxy container
+- name: Run haproxy container
   docker_container:
     state: started
     restart: no
     recreate: no
     name: '{{ haproxy_container_name }}'
-    image: '{{ haproxy_image }}:{{ haproxy_version }}'
+    image: '{{ haproxy_image }}'
     restart_policy: always
     published_ports: '{{ haproxy_published_ports }}'
     links: '{{ haproxy_links }}'
@@ -45,5 +52,5 @@
     log_driver: '{{ haproxy_container_log_driver }}'
     log_opt: '{{ haproxy_container_log_opt }}'
 
-- name: reload haproxy
+- name: Reload haproxy
   shell: docker kill --signal=HUP {{ haproxy_container_name }}
