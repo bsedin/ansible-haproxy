@@ -1,56 +1,56 @@
 ---
-- name: ensure haproxy config dir
-  file:
-    dest: '{{ item }}'
+- name: Ensure haproxy config dir
+  ansible.builtin.file:
+    dest: "{{ item }}"
     state: directory
-    owner: '{{ haproxy_user }}'
-    group: '{{ haproxy_group }}'
+    owner: "{{ haproxy_user }}"
+    group: "{{ haproxy_group }}"
   with_items:
-    - '{{ haproxy_config_dir }}'
-    - '{{ haproxy_ssl_dir }}'
+    - "{{ haproxy_config_dir }}"
+    - "{{ haproxy_ssl_dir }}"
 
 - name: Create haproxy config file
-  template:
+  ansible.builtin.template:
     src: haproxy.cfg.j2
-    dest: '{{ haproxy_config_dir }}/haproxy.cfg'
-    owner: '{{ haproxy_user }}'
-    group: '{{ haproxy_group }}'
+    dest: "{{ haproxy_config_dir }}/haproxy.cfg"
+    owner: "{{ haproxy_user }}"
+    group: "{{ haproxy_group }}"
 
 - name: Test haproxy configuration
-  docker_container:
+  community.docker.docker_container:
     state: started
-    restart: yes
-    recreate: yes
-    restart_policy: no
-    auto_remove: no
-    detach: no
-    interactive: no
+    restart: true
+    recreate: true
+    restart_policy: false
+    auto_remove: false
+    detach: false
+    interactive: false
     name: haproxy-configtest
-    links: '{{ haproxy_links }}'
-    networks: '{{ haproxy_networks }}'
-    image: '{{ haproxy_image }}'
-    volumes: '{{ haproxy_volumes }}'
-    entrypoint: ''
+    links: "{{ haproxy_links }}"
+    networks: "{{ haproxy_networks }}"
+    image: "{{ haproxy_image }}"
+    volumes: "{{ haproxy_volumes }}"
+    entrypoint: ""
     command: haproxy -c -V -f /var/lib/haproxy/config/haproxy.cfg
 
 - name: Run haproxy container
-  docker_container:
+  community.docker.docker_container:
     state: started
-    restart: no
-    recreate: no
-    name: '{{ haproxy_container_name }}'
-    image: '{{ haproxy_image }}'
+    restart: false
+    recreate: false
+    name: "{{ haproxy_container_name }}"
+    image: "{{ haproxy_image }}"
     restart_policy: always
-    published_ports: '{{ haproxy_published_ports }}'
-    links: '{{ haproxy_links }}'
-    network_mode: '{{ haproxy_network_mode }}'
-    networks: '{{ haproxy_networks }}'
-    sysctls: '{{ haproxy_sysctls }}'
-    ulimits: '{{ haproxy_ulimits }}'
-    volumes: '{{ haproxy_volumes }}'
-    command: '{{ haproxy_command }}'
-    log_driver: '{{ haproxy_container_log_driver }}'
-    log_opt: '{{ haproxy_container_log_opt }}'
+    published_ports: "{{ haproxy_published_ports }}"
+    links: "{{ haproxy_links }}"
+    network_mode: "{{ haproxy_network_mode }}"
+    networks: "{{ haproxy_networks }}"
+    sysctls: "{{ haproxy_sysctls }}"
+    ulimits: "{{ haproxy_ulimits }}"
+    volumes: "{{ haproxy_volumes }}"
+    command: "{{ haproxy_command }}"
+    log_driver: "{{ haproxy_container_log_driver }}"
+    log_opt: "{{ haproxy_container_log_opt }}"
 
 - name: Reload haproxy
-  shell: docker kill --signal=HUP {{ haproxy_container_name }}
+  ansible.builtin.command: docker kill --signal=HUP {{ haproxy_container_name }}
