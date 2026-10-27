@@ -5,6 +5,7 @@
     state: directory
     owner: "{{ haproxy_user }}"
     group: "{{ haproxy_group }}"
+    recurse: true
   with_items:
     - "{{ haproxy_config_dir }}"
     - "{{ haproxy_ssl_dir }}"
